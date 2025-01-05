@@ -1,0 +1,5 @@
+Total Iterations Taken:17018
+LSE:0.037228907710258295
+PolynomialOrder: 3
+LearningRate: 0.01
+weight: [-1.39509196e-02  9.77829299e+00 -2.93284428e+01  1.96762581e+01]

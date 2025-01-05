@@ -1,0 +1,4 @@
+# Ignore all files in C:\MyDocuments\Github\ML_DS\.venv
+
+.venv/
+.idea/

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+#from matplotlib.gridspec import GridSpec
 
 
 class MaximumLikelihood:
@@ -9,14 +10,15 @@ class MaximumLikelihood:
         self.std = std
         self.distribution = pd.DataFrame()
         self.no_of_datapoints = datapoints
-        self.gaussianDistribution(self.mean,self.std)
+        self.distribution = self.gaussianDistribution(self.mean,self.std)
+        #self.fig_1, self.axes_1 = plt.subplots(figsize=(8, 4), nrows=2, ncols=3)
 
     def gaussianDistribution(self,mean,std):
         X = self.generateRandomValues()
         N = []
         for x in X:
-         N.append((1/(2*np.pi*np.square(std)))*np.exp((-1/(2*np.square(std)))*np.square(x-mean)))
-        self.distribution = pd.DataFrame({'X': X, 'Distribution': N})
+            N.append((1/(2*np.pi*np.square(std)))*np.exp((-1/(2*np.square(std)))*np.square(x-mean)))
+        return pd.DataFrame({'X': X, 'Distribution': N})
         #return N
     def likelihood(self,mean,std):
         #X = self.generateRandomValues()
@@ -51,7 +53,7 @@ class MaximumLikelihood:
         ####Plot Original Distribution ############
         dist_df=self.distribution.sort_values(by='X',ignore_index=True)
         axes_1[0].plot(dist_df.X, dist_df.Distribution,color='navy', label='Original Plot')
-        axes_1[0].text(dist_df['X'][0], dist_df.sort_values(by='Distribution')['Distribution'].iloc[-2], r'$\mu = 0$' + "\n"+r'$\sigma = 2$',
+        axes_1[0].text(dist_df['X'][0], dist_df.sort_values(by='Distribution')['Distribution'].iloc[-2], r'$\mu = $' + str(self.mean)+"\n"+r'$\sigma = $'+str(self.std),
                        color='navy')
         axes_1[0].set_title('Distribution')
 
@@ -69,7 +71,7 @@ class MaximumLikelihood:
         for s in estimate_std:
             likelihood_output.append(self.likelihood(mean_ML, s))
 
-        df_std = pd.DataFrame({'estimate_std': estimate_mean, 'likelihood': likelihood_output})
+        df_std = pd.DataFrame({'estimate_std': estimate_std, 'likelihood': likelihood_output})
         max_likelihood_idx = df_std['likelihood'].idxmax()
         max_likelihood_value = df_std['likelihood'].max()
         std_ML = df_std['estimate_std'][max_likelihood_idx]
@@ -86,15 +88,43 @@ class MaximumLikelihood:
         axes_1[2].set_title('Maximum Likehood for std')
 
         ####Plot Distribution after maximization ############
-        self.gaussianDistribution(mean_ML, std_ML)
-        dist_df = self.distribution.sort_values(by='X', ignore_index=True)
+        df = self.gaussianDistribution(mean_ML, std_ML)
+        dist_df = df.sort_values(by='X', ignore_index=True)
         axes_1[0].plot(dist_df.X, dist_df.Distribution, color='orange',label='With Maximum Likelihood')
         axes_1[0].text(dist_df['X'][0], dist_df.sort_values(by='Distribution')['Distribution'].iloc[-2],
                        r'$\mu = $' +str(mean_ML)+ "\n" + r'$\sigma = $'+str(std_ML),
                        color='orange')
         axes_1[0].legend(loc=0)
-
+        fig_1.savefig("maximumLikelihood")
         plt.show()
+
+    def maximumLikelihoodDervWay(self):
+        dist_df = self.distribution.sort_values(by='X', ignore_index=True)
+        mean_ML = dist_df.X.sum()/self.no_of_datapoints
+        variance_ML = dist_df['X'].apply(lambda x: np.power((x-mean_ML),2)).sum()
+        std_ML = np.sqrt((variance_ML/self.no_of_datapoints))
+        print(mean_ML)
+        print(std_ML)
+
+        fig_1, axes_1 = plt.subplots(figsize=(8, 4), nrows=1, ncols=1)
+        axes_1.set_title("Gaussian Distribution")
+        axes_1.set_ylim([0,1])
+        axes_1.set_xlim([-1.5, 1.5])
+        axes_1.plot(dist_df.X,dist_df.Distribution, color ='navy', label='Original distribution')
+
+        df = self.gaussianDistribution(mean_ML,std_ML)
+        dist_df = df.sort_values(by='X', ignore_index=True)
+        axes_1.plot(dist_df.X, dist_df.Distribution, color='orange', label = 'Maximum likelihood distribution')
+        axes_1.legend(loc=0)
+        axes_1.text(-1, 0.9, r'$\mu = $' + str(self.mean), color='navy')
+        axes_1.text(-1, 0.8, r'$\sigma = $' + str(self.std), color= 'navy')
+        axes_1.text(-1, 0.7, r'$\mu_{ML} = $' + str(mean_ML), color='orange')
+        axes_1.text(-1,0.6,r'$\sigma_{ML} =$' + str(std_ML),color='orange')
+        fig_1.savefig("maximumLikelihoodDervWay")
+        plt.show()
+
+
+
 
 
     def plotGraph(self):
@@ -115,3 +145,4 @@ ml = MaximumLikelihood()
 #ml.gaussianDistribution()
 #ml.plotGraph()
 ml.maximumLikelihood()
+ml.maximumLikelihoodDervWay()

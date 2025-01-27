@@ -102,11 +102,14 @@ class MaximumLikelihood:
         dist_df = self.distribution.sort_values(by='X', ignore_index=True)
         mean_ML = dist_df.X.sum()/self.no_of_datapoints
         variance_ML = dist_df['X'].apply(lambda x: np.power((x-mean_ML),2)).sum()
-        std_ML = np.sqrt((variance_ML/self.no_of_datapoints))
+        #std_ML = np.sqrt((variance_ML/self.no_of_datapoints))
+        #adding unbiased std
+        std_ML = np.sqrt((variance_ML/(self.no_of_datapoints - 1)))
         print(mean_ML)
         print(std_ML)
 
         fig_1, axes_1 = plt.subplots(figsize=(8, 4), nrows=1, ncols=1)
+
         axes_1.set_title("Gaussian Distribution")
         axes_1.set_ylim([0,1])
         axes_1.set_xlim([-1.5, 1.5])

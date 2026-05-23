@@ -1,0 +1,5 @@
+numpy
+pandas
+statadict
+emipiricaldict
+matplotlib
